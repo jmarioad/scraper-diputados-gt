@@ -17,16 +17,17 @@ class Diputados
       "name" => (profile[0].inner_text).gsub('Nombre:','').squeeze(' ').strip,
       "party" => party,
       "current_stand" => current_stand,
-      "email" => '', #(profile[1].inner_text).gsub('E-mail:','').squeeze(' ').strip, #Can't scrape this value, is protected by Cloudflare http://www.cloudflare.com/email-protection
+      "email" => '', #(profile[1].inner_text).gsub('E-mail:','').squeeze(' ').strip, #Can't scrape this value, it's protected by Cloudflare http://www.cloudflare.com/email-protection
       "phone" => (profile[2].inner_text).gsub('Teléfono de Oficina:','').strip,
       "address" => (profile[3].inner_text).gsub('Dirección de Oficina:','').strip,
       "url" => profile_url
     }
 
-    puts '<---------------'
-    puts record
-    puts '--------------/>'
-    # ScraperWiki.save_sqlite(["uid"], record)
+    #puts '<---------------'
+    #puts record
+    #puts '--------------/>'
+    ScraperWiki.save_sqlite(["uid"], record)
+    puts "Adds new record " + record['name']
   end
 
   # Obtains the profiles
