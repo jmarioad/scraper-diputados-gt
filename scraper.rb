@@ -7,7 +7,7 @@ require 'mechanize'
 class Diputados
 
   # For each parliamentarian
-  def per_person profile_url, uid
+  def per_person profile_url, uid, party, current_stand
     agent = Mechanize.new
     profile_page = agent.get(profile_url)
     profile = profile_page.at('#datos_contacto #votos').search('li')
@@ -15,6 +15,8 @@ class Diputados
     record = {
       "uid" => uid,
       "name" => (profile[0].inner_text).gsub('Nombre:','').squeeze(' ').strip,
+      "party" => party,
+      "current_stand" => current_stand,
       "email" => '', #(profile[1].inner_text).gsub('E-mail:','').squeeze(' ').strip, #Can't scrape this value, is protected by Cloudflare http://www.cloudflare.com/email-protection
       "phone" => (profile[2].inner_text).gsub('Teléfono de Oficina:','').strip,
       "address" => (profile[3].inner_text).gsub('Dirección de Oficina:','').strip,
@@ -35,10 +37,13 @@ class Diputados
     # Read in a page
     page = agent.get(url)
 
-    page.search('.dir_tabla tr').drop(1).each_with_index do |li, i|
+    page.search('.dir_tabla tr').drop(1).each do |li|
+      @uid = (li.search('td')[0]).inner_text
+      @party = (li.search('td')[2]).inner_text
+      @current_stand = (li.search('td')[3]).inner_text
       url = (li.search('td')[1]).at('a')["href"]
-      per_person url, i+1
-      exit # for fast testing, only the first parliamentarian
+      per_person url, @uid, @party, @current_stand
+      # exit # for fast testing, only the first parliamentarian
     end
   end
 end
